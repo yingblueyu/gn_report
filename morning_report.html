@@ -1,0 +1,155 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1" />
+    <meta name="author" content="zhy" />
+    <title>早班报表</title>
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css">
+    <!--[if lte IE 9]>
+    <script src="js/bootstrap/respond.js"></script>
+    <script src="js/bootstrap/html5shiv.min.js"></script>
+    <![endif]-->
+    <script src="js/bootstrap/jquery-1.12.3.js"></script>
+    <script src="js/bootstrap/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        
+    </div>
+    <div class="row">
+        <div class="col-lg-4">
+            <form>
+
+                <div class="row form-group">
+                    <div class="col-md-4">
+                    <label for="all_flights" class="control-label">所有航班</label>
+                    <input type="text" class="form-control" id="all_flights">
+                    </div>
+                    <div class="col-md-4">
+                    <label for="ofld_flights" class="control-label">拉货航班</label>
+                    <input type="text" class="form-control" id="ofld_flights">
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-md-4">
+                    <label for="all_cargo" class="control-label">出港货量</label>
+                    <input type="text" class="form-control" id="all_cargo">
+                    </div>
+                    <div class="col-md-4">
+                    <label for="ofld_cargo" class="control-label">拉货货量</label>
+                    <input type="text" class="form-control" id="ofld_cargo">
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-md-4">
+                        <label for="cargo_in" class="control-label">入库货量</label>
+                        <input type="text" class="form-control" id="cargo_in">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="cargo_out" class="control-label">出库货量</label>
+                        <input type="text" class="form-control" id="cargo_out">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <button type="submit" class="btn btn-primary col-md-offset-3" id="button_1">生成报表</button>
+                </div>
+
+            </form>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="panel panel-info">
+                <div class="panel-heading" id="info_head_1">报表</div>
+                <div class="panel-body" id="info_1">请在左侧录入相关信息，点击“生成报表”按钮。</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var getPercent = function(num, total) {
+        num = parseFloat(num);
+        total = parseFloat(total);
+        if (isNaN(num) || isNaN(total)) {
+            return -1;
+        }
+        return Math.round((num / total) * 10000.00) / 100 + "%"
+    }
+    
+    var templateFunc = function(str, data) {
+        var computed = str.replace(/\{\{(\w+)\}\}/g, function(match, key) {
+            return data[key];
+        });
+        return computed;
+    }
+
+    var showPanelHead = function () {
+        var d = new Date();
+        mesg = d.getFullYear() + "年" + (d.getMonth() + 1) + "月" + d.getDate() + "日早班报表";
+        $("#info_head_1").text(mesg);
+    }
+
+    $("#button_1").click(function(event) {
+        event.preventDefault();
+        var templateStr = "昨天国内出港保障航班{{flights}}架次，其中{{flights_ofld}}个航班拉货，架次占比{{flights_percent}}；实际离岗{{cargo}}公斤，拉货{{cargo_ofld}}公斤，拉货量占比{{cargo_ofld_percent}}；今日早班收运{{cargo_in}}公斤，实际配运{{cargo_out}}公斤，占比{{cargo_percent}}。";
+        var flights = parseInt($("#all_flights").val());
+        if (isNaN(flights)) {
+            alert("请录入航班数");
+            return;
+        }
+        if (flights == 0) {
+            alert("航班数不能为0");
+            return;
+        }
+        var flights_ofld = parseInt($("#ofld_flights").val());
+        if (isNaN(flights_ofld )) {
+            alert("请录入拉货航班数,如无拉货请录入0");
+            return;
+        }
+        var flights_percent = getPercent(flights_ofld, flights)
+        
+        var cargo = parseInt($("#all_cargo").val());
+        if (isNaN(cargo)) {
+            alert("请录入出港货量");
+            return;
+        }
+        if (cargo == 0) {
+            alert("出港货量不能为0");
+            return;
+        }
+        var cargo_ofld = parseInt($("#ofld_cargo").val());
+        if (isNaN(cargo_ofld )) {
+            alert("请录入拉货货量,如无拉货请录入0");
+            return;
+        }
+        var cargo_ofld_percent = getPercent(cargo_ofld, cargo);
+        
+        var cargo_in = parseInt($("#cargo_in").val());
+        if (isNaN(cargo_in)) {
+            alert("请录入早班收运货量");
+            return;
+        }
+        var cargo_out = parseInt($("#cargo_out").val());
+        if (isNaN(cargo_out)) {
+            alert("请录入早班出港货量");
+            return;
+        }
+        var cargo_percent = getPercent(cargo_out, cargo_in);
+        var mesg = templateFunc(templateStr, {flights: flights, flights_ofld: flights_ofld, flights_percent: flights_percent, cargo: cargo, cargo_ofld: cargo_ofld, cargo_ofld_percent: cargo_ofld_percent, cargo_in: cargo_in, cargo_out: cargo_out, cargo_percent: cargo_percent});
+        //var mesg = "hello";
+        //alert(mesg);
+        $("#info_1").html(mesg);
+
+    })
+
+
+
+    showPanelHead();
+</script>
+</body>
+</html>
