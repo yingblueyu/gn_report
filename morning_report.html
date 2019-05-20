@@ -23,7 +23,7 @@
 <body>
 <div class="container">
     <div class="page-header">
-        
+
     </div>
     <div class="row">
         <div class=" col-xs-12 col-lg-4">
@@ -31,34 +31,41 @@
 
                 <div class="row form-group">
                     <div class="col-xs-6">
-                    <label for="all_flights" class="control-label">所有航班</label>
+                    <label for="all_flights" class="control-label">昨日所有航班个数</label>
                     <input type="text" class="form-control" id="all_flights">
                     </div>
                     <div class=" col-xs-6">
-                    <label for="ofld_flights" class="control-label">拉货航班</label>
+                    <label for="ofld_flights" class="control-label">昨日拉货航班个数</label>
                     <input type="text" class="form-control" id="ofld_flights">
                     </div>
                 </div>
 
                 <div class="row form-group">
                     <div class="col-xs-6">
-                    <label for="all_cargo" class="control-label">出港货量（公斤）</label>
+                    <label for="all_cargo" class="control-label">昨日出港货量(KG)</label>
                     <input type="text" class="form-control" id="all_cargo">
                     </div>
                     <div class="col-xs-6">
-                    <label for="ofld_cargo" class="control-label">拉货货量（公斤）</label>
+                    <label for="ofld_cargo" class="control-label">昨日拉货货量(KG)</label>
                     <input type="text" class="form-control" id="ofld_cargo">
                     </div>
                 </div>
 
                 <div class="row form-group">
                     <div class="col-xs-6">
-                        <label for="cargo_in" class="control-label">入库货量（公斤）</label>
+                        <label for="cargo_in" class="control-label">早班客机入库货量(KG)</label>
                         <input type="text" class="form-control" id="cargo_in">
                     </div>
                     <div class="col-xs-6">
-                        <label for="cargo_out" class="control-label">出库货量（公斤）</label>
+                        <label for="cargo_out" class="control-label">早班客机出库货量(KG)</label>
                         <input type="text" class="form-control" id="cargo_out">
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-xs-6">
+                        <label for="cargo_sf" class="control-label">顺丰货机出港(KG)</label>
+                        <input type="text" class="form-control" id="cargo_sf">
                     </div>
                 </div>
 
@@ -106,7 +113,7 @@
 
     $("#button_1").click(function(event) {
         event.preventDefault();
-        var templateStr = "昨天国内出港保障航班{{flights}}架次，其中{{flights_ofld}}个航班拉货，架次占比{{flights_percent}}；实际离港{{cargo}}吨，拉货{{cargo_ofld}}吨，拉货量占比{{cargo_ofld_percent}}；今日早班收运{{cargo_in}}吨，实际配运{{cargo_out}}吨，占比{{cargo_percent}}。";
+        var templateStr = "昨天国内出港保障航班{{flights}}架次，其中{{flights_ofld}}个航班拉货，架次占比{{flights_percent}}；实际离港{{cargo}}吨，拉货{{cargo_ofld}}吨，拉货量占比{{cargo_ofld_percent}}；今日早班收运{{cargo_in}}吨，实际配运{{cargo_out}}吨，占比{{cargo_percent}}；顺丰货机出港{{cargo_sf}}吨。";
         var flights = parseInt($("#all_flights").val());
         if (isNaN(flights)) {
             alert("请录入航班数");
@@ -149,8 +156,15 @@
             alert("请录入早班出港货量");
             return;
         }
+
+        var cargo_sf = 0;
+        var foo = parseInt($("#cargo_sf").val());
+        if (!isNaN(foo)) {
+          cargo_sf = foo;
+        }
+
         var cargo_percent = getPercent(cargo_out, cargo_in);
-        var mesg = templateFunc(templateStr, {flights: flights, flights_ofld: flights_ofld, flights_percent: flights_percent, cargo: toTons(cargo), cargo_ofld: toTons(cargo_ofld), cargo_ofld_percent: cargo_ofld_percent, cargo_in: toTons(cargo_in), cargo_out: toTons(cargo_out), cargo_percent: cargo_percent});
+        var mesg = templateFunc(templateStr, {flights: flights, flights_ofld: flights_ofld, flights_percent: flights_percent, cargo: toTons(cargo), cargo_ofld: toTons(cargo_ofld), cargo_ofld_percent: cargo_ofld_percent, cargo_in: toTons(cargo_in), cargo_out: toTons(cargo_out), cargo_percent: cargo_percent, cargo_sf: toTons(cargo_sf)});
         $("#info_1").html(mesg);
     })
 
