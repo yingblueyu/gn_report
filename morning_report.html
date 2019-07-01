@@ -67,6 +67,10 @@
                         <label for="cargo_sf" class="control-label">顺丰货机出港(KG)</label>
                         <input type="text" class="form-control" id="cargo_sf">
                     </div>
+                    <div class="col-xs-6">
+                        <label for="cargo_jingang" class="control-label">国内进港货量(KG)</label>
+                        <input type="text" class="form-control" id="cargo_jingang">
+                    </div>
                 </div>
 
                 <div class="row">
@@ -80,6 +84,13 @@
             <div class="panel panel-info">
                 <div class="panel-heading" id="info_head_1">报表</div>
                 <div class="panel-body" id="info_1">请在录入相关信息，点击“生成报表”按钮。</div>
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-lg-6 top">
+            <div class="panel panel-info">
+                <div class="panel-heading" id="info_head_2">报表</div>
+                <div class="panel-body" id="info_2"></div>
             </div>
         </div>
     </div>
@@ -163,9 +174,21 @@
           cargo_sf = foo;
         }
 
+        var cargo_jingang = 0;
+        foo = parseInt($("#cargo_jingang").val());
+        if (!isNaN(foo)) {
+          cargo_jingang = foo;
+        }
+
+        var templateStr = "昨天国内出港保障航班{{flights}}架次，其中{{flights_ofld}}个航班拉货，架次占比{{flights_percent}}；实际离港{{cargo}}吨，拉货{{cargo_ofld}}吨，拉货量占比{{cargo_ofld_percent}}；今日早班收运{{cargo_in}}吨，实际配运{{cargo_out}}吨，占比{{cargo_percent}}；顺丰货机出港{{cargo_sf}}吨。";
         var cargo_percent = getPercent(cargo_out, cargo_in);
         var mesg = templateFunc(templateStr, {flights: flights, flights_ofld: flights_ofld, flights_percent: flights_percent, cargo: toTons(cargo), cargo_ofld: toTons(cargo_ofld), cargo_ofld_percent: cargo_ofld_percent, cargo_in: toTons(cargo_in), cargo_out: toTons(cargo_out), cargo_percent: cargo_percent, cargo_sf: toTons(cargo_sf)});
         $("#info_1").html(mesg);
+
+        templateStr = "昨日出港量{{cargo_chugang}}吨，进港量{{cargo_jingang}}吨，吞吐量{{cargo_all}}吨。";
+        mesg = templateFunc(templateStr, {cargo_chugang: toTons(cargo), cargo_jingang: toTons(cargo_jingang), cargo_all: toTons(cargo + cargo_jingang)});
+        $("#info_2").html(mesg);
+
     })
 
     showPanelHead();
